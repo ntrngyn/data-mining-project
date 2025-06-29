@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dự đoán mức độ rủi ro thai sản</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <h2>🧪 Dự đoán mức độ rủi ro thai sản</h2>
+
+    <form method="POST" id="predictForm">
+        <label>Tuổi</label>
+        <input type="number" name="age" step="any">
+
+        <label>Huyết áp tâm thu</label>
+        <input type="number" name="systolic" step="any">
+
+        <label>Huyết áp tâm trương</label>
+        <input type="number" name="diastolic" step="any">
+
+        <label>Chỉ số đường huyết (BS)</label>
+        <input type="number" name="bs" step="any">
+
+        <label>Nhiệt độ cơ thể</label>
+        <input type="number" id="bodytemp" name="bodytemp" step="any">
+        <div class="temp-options">
+            <label><input type="radio" name="temp_unit" value="C" checked> °C</label>
+            <label><input type="radio" name="temp_unit" value="F"> °F</label>
+        </div>
+
+        <label>Nhịp tim</label>
+        <input type="number" name="heartrate" step="any">
+
+        <div class="button-group">
+            <button type="submit">Dự đoán</button>
+            <button type="button" onclick="clearForm()">Xóa</button>
+        </div>
+    </form>
+
+    {% if prediction_text %}
+    <div id="overlay" onclick="closeModal()"></div>
+    <div class="modal" id="resultModal">
+        <span class="close" onclick="closeModal()">×</span>
+        <div class="modal-content">{{ prediction_text | safe }}</div>
+    </div>
+    <script>
+        // Tự động mở modal khi có kết quả
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('resultModal').style.display = 'block';
+        });
+
+        function closeModal() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('resultModal').style.display = 'none';
+        }
+    </script>
+    {% endif %}
+
+    <script>
+        function convertTempToF() {
+            const tempInput = document.getElementById('bodytemp');
+            const unit = document.querySelector('input[name="temp_unit"]:checked').value;
+
+            if (unit === "C" && tempInput.value !== "") {
+                const tempF = parseFloat(tempInput.value) * 9 / 5 + 32;
+                tempInput.value = tempF.toFixed(2);
+            }
+        }
+
+        function clearForm() {
+            document.querySelector('form').reset();
+        }
+
+        document.getElementById('predictForm').addEventListener('submit', convertTempToF);
+    </script>
+</body>
+
+</html>
